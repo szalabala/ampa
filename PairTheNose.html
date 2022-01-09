@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>AMPE nose game</title>
+  <meta name="copyright" content="&copy; 2021 Balazs Szalai" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="minimal-ui,width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <script type="text/javascript" src="js/hbwega.js"></script>
+  <script type="text/javascript" src="js/hbpairgame.js"></script>
+  <script>
+    gameDesc._name = "AMPE noe game";
+    //gameDesc._shortMs = 500;
+    //gameDesc._longMs = 1500;
+    gameDesc.W = 6;
+    gameDesc.H = 3;
+    gameDesc.image = { 
+        //tabla_w:"images/ampa-logo-w.jpg", tabla_h:"images/ampa-logo-h.jpg", 
+        tabla_w:"x", tabla_h:"x", 
+        doorClosed: 'images/back300.jpg', doorOpen: 'images/back300.jpg', 
+        cardBackImg: "images/back300.jpg",
+        imgEmpty:"data:,",
+        path:"nose", prefix:"p" };
+    gameDesc.modes = [
+  		{ id:1, match:'-', n1:3, good:18, pairs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36], name:"beginner", desc:"" }    ];
+    gameDesc.messages = {
+        intro: "Find the pairs!",
+        showMode: "Find the pairs!",
+        eval_good: [ "Fantastic!"  ],
+        eval_bad: [ "Let's do it one more time." ],
+        eval_end: [ "The end.!" ]
+    };
+    gameDesc.cookiestore = "hbnonap2021";
+    hbgui.mainAreaHeightPc = 80;
+    hbgui.mainAreaWidthPc = 80;
+    function startOnce0() {
+        const queryString = window.location.search;
+        if (queryString != '') {
+            const urlParams = new URLSearchParams(queryString);
+            gameData.xx = urlParams.get('xx')
+            gameData.en = urlParams.has('en')
+            if (urlParams.has('end')) {
+                setTimeout(playClosing, 2 * hbgui._longMs);
+            }
+            if (gameData.en) {
+                gameDesc.messages.showMode = gameDesc.messages.showMode_en;
+            }
+        }
+
+        if (gameData.xx && Math.floor(parseInt(gameData.xx) / 399) == 24) {
+            gameDesc.image.path = "tools";
+            gameDesc.image.prefix = "m";
+            gameDesc.modes[0].pairs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            gameDesc.image.cardBackImg = "tools/b1.jpg";
+            gameDesc.image.tabla_w = "";
+            gameDesc.image.tabla_h = "";
+        }
+    }
+    function startOnce2() {
+        //document.getElementById('tabla').style.display = 'none';
+        document.body.style.backgroundImage = 'url(images/csempe_zold2.jpg)';
+        document.getElementById('tabla').style.filter = 'invert(0)';
+        document.getElementById('b1').style.border = '3px solid yellow';
+        document.getElementById('b1').style.borderRadius = '35%';
+        document.getElementById('b1').style.maxHeight = '10vh';
+        document.getElementById('b1').style.maxWidth = '10vh';
+        hbgui.myBlink(document.getElementById('b1'));
+        
+    }
+    var heartpos18w = [ {x_pc: 30, y_pc: 0 }, {x_pc: 40, y_pc: 0 }, {x_pc: 60, y_pc: 0 }, {x_pc: 70, y_pc: 0 },
+                       {x_pc: 20, y_pc: 10 }, {x_pc: 50, y_pc: 10 }, {x_pc: 80, y_pc: 10 },
+                       {x_pc: 15, y_pc: 25 }, {x_pc: 85, y_pc: 25 },
+                       {x_pc: 15, y_pc: 40 }, {x_pc: 85, y_pc: 40 },
+                       {x_pc: 20, y_pc: 55 }, {x_pc: 80, y_pc: 55 },
+                       {x_pc: 30, y_pc: 70 }, {x_pc: 70, y_pc: 70 },
+                       {x_pc: 40, y_pc: 85 }, {x_pc: 60, y_pc: 85 },
+                       {x_pc: 50, y_pc: 100 } ];
+    var heartpos18h = [ {x_pc: 25, y_pc: 15 }, {x_pc: 40, y_pc: 15 }, {x_pc: 60, y_pc: 15 }, {x_pc: 75, y_pc: 15 },
+                       {x_pc: 10, y_pc: 20 }, {x_pc: 50, y_pc: 23 }, {x_pc: 90, y_pc: 20 },
+                       {x_pc:  1, y_pc: 30 }, {x_pc: 99, y_pc: 30 },
+                       {x_pc:  1, y_pc: 40 }, {x_pc: 99, y_pc: 40 },
+                       {x_pc: 15, y_pc: 50 }, {x_pc: 85, y_pc: 50 },
+                       {x_pc: 30, y_pc: 60 }, {x_pc: 70, y_pc: 60 },
+                       {x_pc: 40, y_pc: 70 }, {x_pc: 60, y_pc: 70 },
+                       {x_pc: 50, y_pc: 80 } ];
+
+    hbgui.getEndingPosPcOf = function (posId) {                // return { x_pc, y_pc } -- 'parking positions'
+        if (gameDesc.W > gameDesc.H) {
+            return { x_pc: heartpos18w[posId].x_pc, // Math.floor( Math.floor(posId / 2) * 100 / (gameData.totalPairs - 1) ),
+                     y_pc: heartpos18w[posId].y_pc, // Math.floor( (posId % 2 == 0) ? 2 : 98),
+                     z: 10,
+                     scale: 0.6,
+                     rotX: 0 };
+        } else {
+            return { x_pc: heartpos18h[posId].x_pc, //Math.floor( (posId % 2 == 0) ? 2 : 98),
+                     y_pc: heartpos18h[posId].y_pc, //Math.floor( Math.floor(posId / 2) * 100 / (gameData.totalPairs - 1) ),
+                     z: 10,
+                     scale: 0.6,
+                     rotX: 0 };
+       }
+    }
+
+    function getClosingMsg() {
+        var msg = "Congratulations";
+        return msg;
+    }
+    //hbgui.getPosPcOfPosId = hbgui.getEndingPosPcOf;
+    gameData.getGameStatusMsg = function() { return "" };
+    </script>
+</head>
+<body onload="startOnce();" onresize="hbgui.myResize();">
+    <div id="toptable" style="position:absolute;width:100%;height:100%;padding:0;">  <!-- 3D perspective:100px; -->
+        <div id="cardscontainer"></div>  <!--  style="position:absolute;width:100%;height:100%;padding:0;" -->
+        <img id="tabla" class="back" src="data:," style="display:none;position:absolute;float:left;left:0;padding:0;text-align:center;vertical-align:top;width:95%;height:95%;max-height:95vh;max-width:95vw;border-radius:35%;z-index:-1;object-fit:contain;object-position:center center;">
+        <div style="position:relative;float:right;width:90%;text-align:right;vertical-align:top;">
+            <p id='volume' style="text-align:right"><img id="bvol" src="images/volume2b.png" style="max-height:5vmin;margin:1vmin;display:none" onclick="hbgui.toggleAudio()"><img id='fullscr' src="images/fullscr2a.png" style="max-height:5vmin;margin:1vmin" onclick="hbgui.toggleFullScr()">
+                <br><img src="images/about.png" style="max-height:10vmin" onclick="showAbout()"></p>
+            </div>
+            <div id="selectModeDiv" style="position:fixed;float:left;left:15%;top:10%;width:70%;padding:0;text-align:center;">
+                <p id="bigtext" class="xl" style="text-align:center;font-stretch:semi-condensed">Happy Piggies
+				!</p><br>
+            </div>
+            <div id="aboutDiv" class="medium" style="position:fixed;float:left;left:10%;top:20%;width:80%;padding:0;xtext-align:center;display:none;">
+                <button class="big modebutton" style="position:fixed;left:60%;top:50%;" onclick="closeAbout()">
+                    <img id="btnAbout" src="data:," style="border-radius:25%;max-height:50%;max-width:50%;animation: blink1 2000ms infinite;"></button>
+                    <p id="texta" class="medium" style="padding:0;text-align:left;font-stretch:semi-condensed;line-height:1em;">
+                        <h3>Piggy noses!</h3>
+                        Játék: Szalai Balázs <a href="https://www.buymeacoffee.com/szalabala" target="_blank"><img src="images/bmc-logo-no-background.png" alt="Buy Me A Coffee" style="max-height:1em;vertical-align:bottom;" ></a>, <a rel="license" href="http://www.gnu.org/licenses/gpl-3.0.en.html">GPL v3</a>
+                        <br>Photos: AMPE facebook group
+                    </p><p class="small">
+                        <br><a href="terms.html" target="_blank">Conditions</a>, <a href="cookies.html" target="_blank">Cookies</a>
+                    </p>
+                </div>
+                <cite id="status" class="big" style="position:absolute;float:left;top:0%;text-align:left;"></cite>
+                <div id='footer' style="position:absolute;float:left;left:0%;bottom:0%;width:100%;padding:0;margin:0;text-align:left;font-stretch:semi-condensed;">
+                    <cite id="credit" class="medium" style="display:none;position:absolute;float:right;right:0%;bottom:0%;padding:0;margin:0;text-align:right;"><i>&copy; Copyright 2021 szalabala</i></cite>
+                </div>
+            </div>
+            <!-- if you create your a game using this HBWEGA engine, please keep the referene visible in the about with copyright info as below:
+                Engine: &copy; Szalai Balázs <a href="https://www.buymeacoffee.com/szalabala" target="_blank"><img src="images/bmc-logo-no-background.png" alt="Buy Me A Coffee" style="max-height: 1em;vertical-align:bottom;" ></a>, GPL <a href="http://www.gnu.hu/gpl.html">hu</a>/<a href="http://www.gnu.org/licenses/gpl-3.0.en.html">en</a>
+                https://www.buymeacoffee.com/szalabala   images/bmc-logo-no-background.png
+                <audio id="myaudio" src="sounds/nincs2intro.m4a" loop noautoplay> </audio>
+                <button id="restartbutton" class="xl modebutton" style="left:42%;border-color:blue;" onclick="start()"><img src="images/door_key.png" style="max-width:15vw;max-height:15vh"></button>
+            -->
+    </body>
+</html>
+        
