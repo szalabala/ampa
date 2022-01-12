@@ -507,6 +507,7 @@
         img.id = id;
         img.src = isrc;
         img.classList.add("mozgo");
+        img.style.position = "absolute"; // 3d
         img.style.borderRadius = "25%";
         img.style.maxWidth = "30vw";
         img.style.maxHeight = "30vh";
